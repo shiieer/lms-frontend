@@ -23,15 +23,26 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Copy necessary files from build stage
-COPY --from=build /app/public ./public
+# Copy standalone output from build stage
+# Next.js standalone includes server.js and all required dependencies
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
+# Copy static files (CSS, JS, images, etc.) - must be in .next/static
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy public folder (static assets) - must be accessible at root
+COPY --from=build --chown=nextjs:nodejs /app/public ./public
+# Also copy public to standalone directory if needed (before switching user)
+RUN mkdir -p .next/standalone/public && \
+    cp -r public/* .next/standalone/public/ 2>/dev/null || true && \
+    chown -R nextjs:nodejs .next/standalone/public 2>/dev/null || true
+# Copy messages folder for next-intl (needed at runtime)
+COPY --from=build --chown=nextjs:nodejs /app/messages ./messages
 
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NEXT_TELEMETRY_DISABLED=1
 
+# Use standalone server.js as recommended by Next.js
 CMD ["node", "server.js"]
