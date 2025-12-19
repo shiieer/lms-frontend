@@ -2,5 +2,16 @@
 .github
 node_modules
 .next/cache
+.next/standalone
+.next/static
 *.log
 .DS_Store
+.env*.local
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+coverage
+.nyc_output
+*.tsbuildinfo

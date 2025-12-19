@@ -1,10 +1,8 @@
-version: "3.8"
-
 services:
   frontend:
     build:
-      context: ./current
-      dockerfile: ../Dockerfile.frontend
+      context: .
+      dockerfile: Dockerfile.frontend
     container_name: koupii-frontend
     restart: unless-stopped
     ports:
